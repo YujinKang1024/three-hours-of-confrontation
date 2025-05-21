@@ -14,12 +14,18 @@ public class ChatBubble : MonoBehaviour
 
     void Start()
     {
-        string longText = "거 참, 영문을 모르겠네요. 무슨 말씀을 하시는 겁니까? 분할 테스트용 테스트 작성 중입니다.";
-        SplitText(longText, 40);
+        string longText = "······.";
+        SplitText(longText, 84);
         ShowTextPage(0);
 
         nextButton.onClick.AddListener(ShowNext);
         prevButton.onClick.AddListener(ShowPrev);
+    }
+
+    public void SetText(string text, int maxChars = 84)
+    {
+        SplitText(text, maxChars);
+        ShowTextPage(0);
     }
 
     void SplitText(string text, int maxChars)
@@ -40,6 +46,7 @@ public class ChatBubble : MonoBehaviour
         prevButton.gameObject.SetActive(currentIndex > 0);
         nextButton.gameObject.SetActive(currentIndex < splitTexts.Count - 1);
     }
+
     
     void ShowNext() => ShowTextPage(currentIndex + 1);
     void ShowPrev() => ShowTextPage(currentIndex - 1);

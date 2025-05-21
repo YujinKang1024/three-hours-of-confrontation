@@ -147,7 +147,8 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      criminal_standing_0: -1860777358089120621
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

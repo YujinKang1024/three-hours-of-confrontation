@@ -147,7 +147,8 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      thinking_icon_0: 812442455464159692
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
