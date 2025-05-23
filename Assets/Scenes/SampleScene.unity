@@ -317,7 +317,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &123544215
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1857,8 +1857,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 14919f38def87c34497487081450f146, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  remainingTime: 10
-  timePerChat: 5
+  remainingTime: 4
+  timePerChat: 2
   timeText: {fileID: 922495768}
   gameOverPanel: {fileID: 123544214}
   gptManager: {fileID: 1307834808}

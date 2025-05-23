@@ -6,12 +6,10 @@ using System.Text;
 public class GPTConnector : MonoBehaviour
 {
     private string apiKey;
-    private string systemMessage;
 
     void Start()
     {
         apiKey = LoadResource("apiKey");
-        systemMessage = LoadResource("systemPrompt");
         Debug.Log("[GPTConnector] API Key Loaded: " + (string.IsNullOrEmpty(apiKey) ? "❌" : "✅"));
     }
 
@@ -26,7 +24,7 @@ public class GPTConnector : MonoBehaviour
         return textAsset.text.Trim();
     }
 
-    public IEnumerator RequestToCustomGPT(string userMessage, System.Action<string> onResponse)
+    public IEnumerator RequestToCustomGPT(string systemMessage, string userMessage, System.Action<string> onResponse)
     {
         string url = "https://api.openai.com/v1/chat/completions";
         ChatRequest chatRequest = new ChatRequest(systemMessage, userMessage);

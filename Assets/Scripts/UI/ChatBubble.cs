@@ -48,6 +48,12 @@ public class ChatBubble : MonoBehaviour
 
         prevButton.gameObject.SetActive(currentIndex > 0);
         nextButton.gameObject.SetActive(currentIndex < splitTexts.Count - 1);
+
+        if (currentIndex == splitTexts.Count - 1 && onComplete != null)
+        {
+            onComplete.Invoke();
+            onComplete = null;
+        }
     }
 
     

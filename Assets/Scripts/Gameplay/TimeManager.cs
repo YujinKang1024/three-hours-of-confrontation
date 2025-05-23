@@ -1,3 +1,4 @@
+using System.Collections;   
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
@@ -42,13 +43,9 @@ public class TimeManager : MonoBehaviour
         gameOverPanel.SetActive(true);
     }
 
-    public void TriggerFinalDialogue()
+    public IEnumerator GameOverAfterDelay(float seconds)
     {
-        string history = gptManager.conversationLogger.GetLogText();
-        string prompt = $"{history}\n\n" +
-            "당신은 지금까지 플레이어와 180분 대화를 나눈 캐릭터입니다.\n" +
-            "이제 시간이 다 되었고, 플레이어에게 마지막 작별 인사를 해줘야 합니다.";
-
-        gptManager.RequestFinalGptMessage(prompt);
+        yield return new WaitForSeconds(seconds);
+        gameOverPanel.SetActive(true);
     }
 }
