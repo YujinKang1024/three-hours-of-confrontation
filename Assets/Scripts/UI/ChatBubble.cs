@@ -11,6 +11,7 @@ public class ChatBubble : MonoBehaviour
 
     private List<string> splitTexts = new();
     private int currentIndex = 0;
+    private System.Action onComplete;
 
     void Start()
     {
@@ -22,8 +23,10 @@ public class ChatBubble : MonoBehaviour
         prevButton.onClick.AddListener(ShowPrev);
     }
 
-    public void SetText(string text, int maxChars = 84)
+
+    public void SetText(string text, int maxChars = 84, System.Action onComplete = null)
     {
+        this.onComplete = onComplete;
         SplitText(text, maxChars);
         ShowTextPage(0);
     }
