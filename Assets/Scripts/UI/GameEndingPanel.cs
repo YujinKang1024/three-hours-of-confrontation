@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-public class GameOverPanel : MonoBehaviour
+public class GameEndingPanel : MonoBehaviour
 {
     public Button saveButton;
     public Button restartButton;

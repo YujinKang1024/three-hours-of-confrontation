@@ -18,7 +18,7 @@ public class GPTManager : MonoBehaviour
     public ScrollRect scrollRect;
     public TimeManager timeManager;
     public ConversationLogger conversationLogger;
-    public GameObject timeOverButton;
+    public GameObject endingButton;
     public GameFlowManager gameFlowManager;
 
     void Start()
@@ -103,6 +103,9 @@ public class GPTManager : MonoBehaviour
         {
             GameStateManager.Instance.MarkConfession();
             Debug.Log("[GPTManager] 자백 태그 감지됨");
+
+            endingButton.SetActive(true);
+            DisableInputField();
         }
     }
 
@@ -142,11 +145,20 @@ public class GPTManager : MonoBehaviour
 
     public void DisableInputField()
     {
-        inputField.text = "약속한 시간이 다 되었다. 더는 대화할 수 없다.";
+        if (GameStateManager.Instance.hasConfessed)
+        {
+            inputField.text = "자백을 받아냈다.";
+        }
+        else
+        {
+            inputField.text = "약속한 시간이 다 되었다. 더는 대화할 수 없다.";
+        }
+
         inputField.interactable = false;
         sendButton.interactable = false;
     }
-    public void RequestFinalGptMessage(string history)
+
+    public void RequestFinalGptMessage(string history, bool isVictory)
     {
         string finalSystemPrompt = LoadPrompt("systemPrompt_final.txt");
         string finalPrompt = history + "\n\n위 상황을 참고해, 마지막 인사를 정리하여 플레이어에게 전하세요.";
@@ -157,17 +169,26 @@ public class GPTManager : MonoBehaviour
 
             chatBubble.SetText(cleanResponse, 84, () =>
             {
-                Debug.Log("콜백 실행됨 - 게임 오버 딜레이 시작");
-                gameFlowManager.TriggerGameOver(5f);
+                Debug.Log($"콜백 실행됨 - 게임 {(isVictory ? "승리" : "패배")} 연출 시작");
+                gameFlowManager.ShowEndingDelayed(isVictory);
             });
         }));
     }
 
+
     public void OnTimeOverButtonClicked()
     {
         string history = conversationLogger.GetLogText();
-        RequestFinalGptMessage(history);
-        timeOverButton.SetActive(false);
-    }
 
+        if (GameStateManager.Instance.hasConfessed)
+        {
+            RequestFinalGptMessage(history, true);
+        }
+        else
+        {
+            RequestFinalGptMessage(history, false);
+        }
+
+        endingButton.SetActive(false);
+    }
 }

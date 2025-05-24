@@ -5,18 +5,18 @@ using TMPro;
 
 public class TimeManager : MonoBehaviour
 {
-    public int remainingTime = 180; // 초기 시간
-    public int timePerChat = 5;     // 채팅 1회당 감소 시간
-    public TMP_Text timeText;       // 시간 UI 
-    public GameObject gameOverPanel; // 게임 오버 패널 
-    public GPTManager gptManager;
+    public int remainingTime = 60;
+    public int timePerChat = 2;    
+    public TMP_Text timeText;       
+    public GameObject gameEndingPanel;
     public ConversationLogger conversationLogger;
-    public GameObject timeOverButton;
+    public GameObject endingButton;
+    public GPTManager gptManager;
 
     void Start()
     {
         UpdateTimeUI();
-        gameOverPanel.SetActive(false);
+        gameEndingPanel.SetActive(false);
     }
 
     public void DecreaseTime()
@@ -27,9 +27,10 @@ public class TimeManager : MonoBehaviour
             remainingTime = 0;
             UpdateTimeUI();
 
+            endingButton.SetActive(true);
             gptManager.DisableInputField();
-            timeOverButton.SetActive(true);
         }
+
         UpdateTimeUI();
     }
 
@@ -42,6 +43,6 @@ public class TimeManager : MonoBehaviour
     {
         remainingTime = 180;
         UpdateTimeUI();
-        timeOverButton.SetActive(false);
+        endingButton.SetActive(false);
     }
 }

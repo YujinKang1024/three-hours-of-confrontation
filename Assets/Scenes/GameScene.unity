@@ -313,7 +313,7 @@ GameObject:
   - component: {fileID: 123544218}
   - component: {fileID: 123544219}
   m_Layer: 5
-  m_Name: GameOverPanel
+  m_Name: GameEndingPanel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -509,19 +509,7 @@ MonoBehaviour:
   m_CharacterLimit: 139
   m_OnEndEdit:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 1307834808}
-        m_TargetAssemblyTypeName: GPTManager, Assembly-CSharp
-        m_MethodName: OnEndEdit
-        m_Mode: 5
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
   m_OnSubmit:
     m_PersistentCalls:
       m_Calls: []
@@ -1586,7 +1574,7 @@ GameObject:
   - component: {fileID: 694004025}
   - component: {fileID: 694004024}
   m_Layer: 5
-  m_Name: Text (TMP)
+  m_Name: EndingTitle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2132,13 +2120,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 14919f38def87c34497487081450f146, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  remainingTime: 4
+  remainingTime: 60
   timePerChat: 2
   timeText: {fileID: 922495768}
-  gameOverPanel: {fileID: 123544214}
-  gptManager: {fileID: 1307834808}
+  gameEndingPanel: {fileID: 123544214}
   conversationLogger: {fileID: 1827327926}
-  timeOverButton: {fileID: 857838753}
+  endingButton: {fileID: 857838753}
+  gptManager: {fileID: 1307834808}
 --- !u!1 &837427330
 GameObject:
   m_ObjectHideFlags: 0
@@ -2321,7 +2309,7 @@ GameObject:
   - component: {fileID: 857838756}
   - component: {fileID: 857838755}
   m_Layer: 5
-  m_Name: TimeOverButton
+  m_Name: EndingButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4009,7 +3997,7 @@ MonoBehaviour:
   scrollRect: {fileID: 783152586}
   timeManager: {fileID: 800918556}
   conversationLogger: {fileID: 1827327926}
-  timeOverButton: {fileID: 857838753}
+  endingButton: {fileID: 857838753}
   gameFlowManager: {fileID: 1856340315}
 --- !u!1 &1364949976
 GameObject:
@@ -4189,7 +4177,7 @@ GameObject:
   - component: {fileID: 1404740383}
   - component: {fileID: 1404740382}
   m_Layer: 5
-  m_Name: Text (TMP)
+  m_Name: EndingMessage
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4878,7 +4866,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   timeManager: {fileID: 800918556}
-  gameOverPanel: {fileID: 123544214}
+  gameEndingPanel: {fileID: 123544214}
+  endingTitle: {fileID: 694004024}
+  endingMessage: {fileID: 1404740382}
+  endingDelaySeconds: 5
 --- !u!1 &1905574813
 GameObject:
   m_ObjectHideFlags: 0
