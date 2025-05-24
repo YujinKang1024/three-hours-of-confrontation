@@ -1,4 +1,5 @@
-using System.Collections;   
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using UnityEngine;
@@ -18,15 +19,7 @@ public class GPTManager : MonoBehaviour
     public TimeManager timeManager;
     public ConversationLogger conversationLogger;
     public GameObject timeOverButton;
-
-    Dictionary<string, int> emotionScores = new Dictionary<string, int> {
-        { "감정폭발", 0 },
-        { "회유", 0 },
-        { "공감", 0 },
-        { "거짓말", 0 },
-        { "평이", 0 }
-    };
-    bool hasConfessed = false;
+    public GameFlowManager gameFlowManager;
 
     void Start()
     {
@@ -88,12 +81,19 @@ public class GPTManager : MonoBehaviour
         var match = Regex.Match(response, @"\[(감정폭발|회유|공감|거짓말|평이) \+(\d+)\]");
         if (match.Success)
         {
-            string tag = match.Groups[1].Value;
+            string tagString = match.Groups[1].Value;
             int value = int.Parse(match.Groups[2].Value);
-            if (emotionScores.ContainsKey(tag))
-                emotionScores[tag] += value;
 
-            Debug.Log($"[GPTManager] 감정 태그 감지: {tag} +{value} (누적: {emotionScores[tag]})");
+            if (Enum.TryParse(tagString, out GameStateManager.EmotionType type))
+            {
+                GameStateManager.Instance.AddEmotionScore(type, value);
+
+                Debug.Log($"[GPTManager] 감정 태그 감지: {type} +{value} (누적: {GameStateManager.Instance.GetEmotionScore(type)})");
+            }
+            else
+            {
+                Debug.LogWarning($"[GPTManager] 알 수 없는 감정 태그: {tagString}");
+            }
         }
     }
 
@@ -101,15 +101,22 @@ public class GPTManager : MonoBehaviour
     {
         if (response.Contains("[자백]"))
         {
-            hasConfessed = true;
-            Debug.Log("[GPTManager] 자백 태그 감지됨. hasConfessed = true;");
+            GameStateManager.Instance.MarkConfession();
+            Debug.Log("[GPTManager] 자백 태그 감지됨");
         }
     }
 
     string GetSystemPrompt()
     {
-        int angerScore = Mathf.Max(emotionScores["감정폭발"], emotionScores["거짓말"]);
-        int empathyScore = Mathf.Max(emotionScores["회유"], emotionScores["공감"]);
+        int angerScore = Mathf.Max(
+            GameStateManager.Instance.GetEmotionScore(GameStateManager.EmotionType.감정폭발),
+            GameStateManager.Instance.GetEmotionScore(GameStateManager.EmotionType.거짓말)
+        );
+
+        int empathyScore = Mathf.Max(
+            GameStateManager.Instance.GetEmotionScore(GameStateManager.EmotionType.회유),
+            GameStateManager.Instance.GetEmotionScore(GameStateManager.EmotionType.공감)
+        );
 
         bool canAngry = angerScore >= 12;
         bool canEmpathy = empathyScore >= 10;
@@ -151,7 +158,7 @@ public class GPTManager : MonoBehaviour
             chatBubble.SetText(cleanResponse, 84, () =>
             {
                 Debug.Log("콜백 실행됨 - 게임 오버 딜레이 시작");
-                StartCoroutine(timeManager.GameOverAfterDelay(5f));
+                gameFlowManager.TriggerGameOver(5f);
             });
         }));
     }
