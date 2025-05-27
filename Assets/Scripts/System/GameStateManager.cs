@@ -12,19 +12,30 @@ public class GameStateManager : MonoBehaviour
 
     public enum EmotionType
     {
-        감정폭발,
-        회유,
-        공감,
-        거짓말,
-        평이
+        감정폭발, 회유, 공감, 거짓말, 평이
     }
 
     private void Awake()
     {
-        if (Instance == null) Instance = this;
-        else Destroy(gameObject);
+        if (Instance == null)
+        {
+            Instance = this;
+            // GameObject가 루트 오브젝트인지 확인
+            if (transform.parent == null)
+            {
+                DontDestroyOnLoad(gameObject);
+            }
+            else
+            {
+                Debug.LogWarning("GameStateManager는 루트 GameObject에 있어야 합니다.");
+            }
+        }
+        else
+        {
+            Destroy(gameObject);
+            return;
+        }
 
-        DontDestroyOnLoad(gameObject);
         InitializeState();
     }
 

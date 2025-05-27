@@ -14,10 +14,13 @@ public class GPTManager : MonoBehaviour
     public GPTConnector gptConnector;
     public ChatBubble chatBubble;
     public TMP_Text playerDialogueText;
-    public TMP_Text logUiText;
+
+    [Header("통합 로그 시스템")]
+    public ConversationLogger conversationLogger;
+    // logUiText 제거 - ConversationLogger가 직접 UI 관리
+
     public ScrollRect scrollRect;
     public TimeManager timeManager;
-    public ConversationLogger conversationLogger;
     public GameObject endingButton;
     public GameFlowManager gameFlowManager;
 
@@ -27,6 +30,16 @@ public class GPTManager : MonoBehaviour
 
         inputField.onEndEdit.RemoveAllListeners();
         inputField.onSubmit.RemoveAllListeners();
+
+        // ConversationLogger UI 연결 확인
+        if (conversationLogger != null)
+        {
+            Debug.Log("[GPTManager] ConversationLogger 연결됨 - 통합 로그 시스템 활성화");
+        }
+        else
+        {
+            Debug.LogError("[GPTManager] ConversationLogger가 연결되지 않았습니다!");
+        }
     }
 
     public void OnClickSend() => OnClickSend(inputField.text);
@@ -36,16 +49,26 @@ public class GPTManager : MonoBehaviour
         if (!inputField.interactable || !sendButton.interactable) return;
         if (string.IsNullOrWhiteSpace(input)) return;
 
-        conversationLogger.AddEntry("[플레이어] :", input);
-        logUiText.text += $"[당신] : {input}\n";
-        playerDialogueText.SetText(input);
+        // ✅ ConversationLogger를 통한 통합 로그 관리
+        conversationLogger.AddPlayerEntry(input);
 
-        Canvas.ForceUpdateCanvases();
-        scrollRect.verticalNormalizedPosition = 1f;
+        // 플레이어 대화 표시 (ChatBubble용)
+        if (playerDialogueText != null)
+        {
+            playerDialogueText.SetText(input);
+        }
+
+        // 스크롤 위치 조정 (ConversationLogger가 자동 처리하지만 추가 보장)
+        if (scrollRect != null)
+        {
+            Canvas.ForceUpdateCanvases();
+            scrollRect.verticalNormalizedPosition = 1f;
+        }
 
         inputField.text = "";
 
-        string history = conversationLogger.GetLogText();
+        // GPT 요청 (최근 대화만 사용하여 토큰 제한 관리)
+        string history = conversationLogger.GetRecentLogText(20); // GPT는 최근 20개만
         string systemPrompt = GetSystemPrompt();
         string prompt = history + $"\n\n[플레이어] : {input}";
 
@@ -57,14 +80,22 @@ public class GPTManager : MonoBehaviour
             CheckConfessionTag(response);
             string cleanResponse = CleanGPTResponse(response);
 
-            conversationLogger.AddEntry("[수현] :", cleanResponse);
-            logUiText.text += $"[진범] : {cleanResponse}\n\n";
-            Canvas.ForceUpdateCanvases();
+            // ✅ ConversationLogger를 통한 통합 로그 관리
+            conversationLogger.AddNPCEntry(cleanResponse);
 
-            chatBubble.SetText(cleanResponse);
+            // ChatBubble에 응답 표시
+            if (chatBubble != null)
+            {
+                chatBubble.SetText(cleanResponse);
+            }
         }));
 
-        timeManager.DecreaseTime();
+        // 시간 감소
+        if (timeManager != null)
+        {
+            timeManager.DecreaseTime();
+        }
+
         inputField.ActivateInputField();
     }
 
@@ -104,7 +135,10 @@ public class GPTManager : MonoBehaviour
             GameStateManager.Instance.MarkConfession();
             Debug.Log("[GPTManager] 자백 태그 감지됨");
 
-            endingButton.SetActive(true);
+            if (endingButton != null)
+            {
+                endingButton.SetActive(true);
+            }
             DisableInputField();
         }
     }
@@ -167,18 +201,28 @@ public class GPTManager : MonoBehaviour
         {
             string cleanResponse = CleanGPTResponse(response);
 
-            chatBubble.SetText(cleanResponse, 84, () =>
+            // ✅ 마지막 대화도 ConversationLogger에 저장
+            conversationLogger.AddNPCEntry(cleanResponse);
+            Debug.Log("[GPTManager] 마지막 GPT 응답이 ConversationLogger에 저장됨");
+
+            if (chatBubble != null)
             {
-                Debug.Log($"콜백 실행됨 - 게임 {(isVictory ? "승리" : "패배")} 연출 시작");
-                gameFlowManager.ShowEndingDelayed(isVictory);
-            });
+                chatBubble.SetText(cleanResponse, 84, () =>
+                {
+                    Debug.Log($"콜백 실행됨 - 게임 {(isVictory ? "승리" : "패배")} 연출 시작");
+                    if (gameFlowManager != null)
+                    {
+                        gameFlowManager.ShowEndingDelayed(isVictory);
+                    }
+                });
+            }
         }));
     }
 
-
     public void OnTimeOverButtonClicked()
     {
-        string history = conversationLogger.GetLogText();
+        // 전체 로그 사용 (마지막 요약이므로)
+        string history = conversationLogger.GetLogText(); // 전체 로그
 
         if (GameStateManager.Instance.hasConfessed)
         {
@@ -189,6 +233,19 @@ public class GPTManager : MonoBehaviour
             RequestFinalGptMessage(history, false);
         }
 
-        endingButton.SetActive(false);
+        if (endingButton != null)
+        {
+            endingButton.SetActive(false);
+        }
+    }
+
+    // 디버깅용
+    [ContextMenu("Debug: Show Current Log")]
+    public void DebugShowCurrentLog()
+    {
+        if (conversationLogger != null)
+        {
+            Debug.Log($"[GPTManager] 현재 로그:\n{conversationLogger.GetLogText()}");
+        }
     }
 }
